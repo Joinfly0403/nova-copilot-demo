@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" data-mode="closed" data-device="desktop">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Nova Copilot · AI Agent 悬浮窗 Demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%237c8bff'/%3E%3Cpath d='M12 4.5 13.6 9.4 18.5 11l-4.9 1.6L12 17.5l-1.6-4.9L5.5 11l4.9-1.6L12 4.5Z' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css?v=20260922">
+</head>
+<body>
+
+<!-- ============================================================
+     宿主页面（模拟真实业务后台，用来演示「上下文共存」）
+     ============================================================ -->
+<div class="host" id="host">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 15.5 9 7l4.2 6.4L15.6 9 20 15.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="17.5" r="1.6" fill="currentColor"/></svg>
+      </span>
+      <span class="brand-name">Nova<b>Metrics</b></span>
+      <span class="env-chip">Growth Console</span>
+    </div>
+    <nav class="topnav" aria-label="主导航">
+      <a class="active" href="#overview">概览</a>
+      <a href="#funnel">漏斗</a>
+      <a href="#cohort">留存</a>
+      <a href="#reports">报表</a>
+    </nav>
+    <div class="topbar-right">
+      <button class="ghost-btn js-demo-trigger" data-mode="dock" title="演示：停靠模式">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15 4v16" stroke="currentColor" stroke-width="1.7"/></svg>
+        停靠面板
+      </button>
+      <button class="avatar js-demo-trigger" data-mode="float" title="和 Aria 聊聊" aria-label="打开 Nova Copilot">
+        <span>林</span><i class="presence" aria-hidden="true"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="host-body">
+    <aside class="sidenav" aria-label="二级导航">
+      <div class="sidenav-group">
+        <p class="sidenav-title">分析</p>
+        <a class="sidenav-link active" href="#overview">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          增长概览</a>
+        <a class="sidenav-link" href="#revenue">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 16l5-6 4 3 7-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          收入分析</a>
+        <a class="sidenav-link" href="#retention">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          留存曲线</a>
+        <a class="sidenav-link" href="#segments">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="8" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 19c1-3 3-4 5-4m5-6c2 0 4 1 5 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          用户分层</a>
+      </div>
+      <div class="sidenav-group">
+        <p class="sidenav-title">协作</p>
+        <a class="sidenav-link" href="#reports">团队报表</a>
+        <a class="sidenav-link" href="#alerts">告警订阅 <em class="dot-badge">3</em></a>
+      </div>
+      <div class="sidenav-foot">
+        <div class="trial-card">
+          <p><b>数据源已同步</b></p>
+          <p>12 张数仓表 · 5 分钟前</p>
+          <span class="mini-bar"><i style="width:82%"></i></span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="canvas" id="canvas">
+      <div class="page-head">
+        <div>
+          <p class="crumb">分析 / 增长概览</p>
+          <h1>增长驾驶舱 <span class="tag">Q3 W38</span></h1>
+          <p class="page-sub">上海 · 亚太区 · 截至 2026-09-21 09:00 (CST)</p>
+        </div>
+        <div class="page-actions">
+          <div class="seg" role="group" aria-label="时间范围">
+            <button class="on">7 天</button><button>30 天</button><button>季度</button>
+          </div>
+          <button class="ghost-btn">导出</button>
+        </div>
+      </div>
+
+      <section class="kpi-grid" aria-label="核心指标">
+        <article class="kpi" id="kpi-revenue">
+          <div class="kpi-top"><span>月度经常性收入</span><i class="kpi-icon mint">¥</i></div>
+          <p class="kpi-value">¥ 4.82<span>M</span></p>
+          <p class="kpi-foot"><span class="delta down">▼ 8.4%</span> 环比 · 目标 ¥5.3M</p>
+          <div class="spark"><svg viewBox="0 0 120 34" preserveAspectRatio="none"><path d="M0 12 L14 10 L26 15 L38 9 L50 16 L62 13 L74 21 L86 18 L98 26 L110 24 L120 30" fill="none" stroke="#f43f5e" stroke-width="2"/></svg></div>
+        </article>
+        <article class="kpi" id="kpi-activation">
+          <div class="kpi-top"><span>新用户激活率</span><i class="kpi-icon violet">%</i></div>
+          <p class="kpi-value">34.7<span>%</span></p>
+          <p class="kpi-foot"><span class="delta up">▲ 2.1pt</span> 环比 · 目标 40%</p>
+          <div class="spark"><svg viewBox="0 0 120 34" preserveAspectRatio="none"><path d="M0 26 L14 24 L26 25 L38 20 L50 21 L62 16 L74 18 L86 12 L98 13 L110 9 L120 7" fill="none" stroke="#22d3ee" stroke-width="2"/></svg></div>
+        </article>
+        <article class="kpi" id="kpi-churn">
+          <div class="kpi-top"><span>企业版流失率</span><i class="kpi-icon rose">↘</i></div>
+          <p class="kpi-value">5.2<span>%</span></p>
+          <p class="kpi-foot"><span class="delta down">▲ 1.3pt</span> 高于健康线 · 12 家</p>
+          <div class="spark"><svg viewBox="0 0 120 34" preserveAspectRatio="none"><path d="M0 28 L14 26 L26 24 L38 27 L50 22 L62 20 L74 15 L86 18 L98 13 L110 15 L120 11" fill="none" stroke="#fbbf24" stroke-width="2"/></svg></div>
+        </article>
+        <article class="kpi" id="kpi-nps">
+          <div class="kpi-top"><span>NPS</span><i class="kpi-icon blue">★</i></div>
+          <p class="kpi-value">61</p>
+          <p class="kpi-foot"><span class="delta up">▲ 4</span> 环比 · 行业 P75</p>
+          <div class="spark"><svg viewBox="0 0 120 34" preserveAspectRatio="none"><path d="M0 20 L14 22 L26 18 L38 20 L50 15 L62 16 L74 13 L86 15 L98 10 L110 12 L120 8" fill="none" stroke="#6366f1" stroke-width="2"/></svg></div>
+        </article>
+      </section>
+
+      <section class="panel chart-panel" aria-label="收入与激活趋势">
+        <div class="panel-head">
+          <div><h2>收入与激活趋势</h2><p class="panel-sub">近 12 周 · 收入（左轴，万元）与激活率（右轴，%）</p></div>
+          <div class="legend"><span class="lg mint"></span>收入<span class="lg cyan"></span>激活率</div>
+        </div>
+        <div class="chart">
+          <svg viewBox="0 0 720 220" preserveAspectRatio="none" class="line-chart" aria-label="趋势图">
+            <defs>
+              <linearGradient id="gMint" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#34d399" stop-opacity=".34"/><stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <g class="grid">
+              <line x1="0" y1="40" x2="720" y2="40"/><line x1="0" y1="90" x2="720" y2="90"/>
+              <line x1="0" y1="140" x2="720" y2="140"/><line x1="0" y1="190" x2="720" y2="190"/>
+            </g>
+            <path d="M0 70 L65 62 L131 74 L196 58 L262 66 L327 50 L393 58 L458 44 L524 52 L589 70 L655 64 L720 78 L720 200 L0 200 Z" fill="url(#gMint)"/>
+            <path d="M0 70 L65 62 L131 74 L196 58 L262 66 L327 50 L393 58 L458 44 L524 52 L589 70 L655 64 L720 78" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M0 150 L65 142 L131 148 L196 128 L262 136 L327 118 L393 124 L458 104 L524 112 L589 100 L655 88 L720 84" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-dasharray="6 5" stroke-linejoin="round"/>
+            <g class="dots">
+              <circle cx="458" cy="44" r="4" fill="#34d399"/><circle cx="458" cy="104" r="4" fill="#22d3ee"/>
+              <circle cx="720" cy="78" r="4" fill="#34d399"/><circle cx="720" cy="84" r="4" fill="#22d3ee"/>
+            </g>
+          </svg>
+          <div class="chart-x"><span>W27</span><span>W28</span><span>W29</span><span>W30</span><span>W31</span><span>W32</span><span>W33</span><span>W34</span><span>W35</span><span>W36</span><span>W37</span><span>W38</span></div>
+        </div>
+        <div class="callout" id="host-callout">
+          <span class="callout-pin" aria-hidden="true"></span>
+          <div><b>W36 起收入连续 3 周下滑</b><p>企业版续费延迟 + 华东区线索质量下降。可让 Aria 归因。</p></div>
+          <button class="ghost-btn js-demo-trigger" data-mode="float" data-prompt="分析一下 W36 以来收入下滑的原因">让 Aria 归因</button>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <section class="panel">
+          <div class="panel-head"><div><h2>渠道转化</h2><p class="panel-sub">本周新增 2,418</p></div></div>
+          <table class="data-table">
+            <thead><tr><th>渠道</th><th>线索</th><th>激活率</th><th>趋势</th></tr></thead>
+            <tbody>
+              <tr><td>自然搜索</td><td>1,204</td><td>41.2%</td><td><span class="delta up">▲ 3.1</span></td></tr>
+              <tr><td>付费投放</td><td>702</td><td>28.9%</td><td><span class="delta down">▼ 5.4</span></td></tr>
+              <tr><td>伙伴推荐</td><td>331</td><td>52.6%</td><td><span class="delta up">▲ 1.8</span></td></tr>
+              <tr><td>内容/社群</td><td>181</td><td>36.4%</td><td><span class="delta up">▲ 0.6</span></td></tr>
+            </tbody>
+          </table>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h2>待办与告警</h2><p class="panel-sub">按影响面排序</p></div></div>
+          <ul class="alert-list">
+            <li><span class="sev high">高</span><div><b>企业版续费提醒未触达 12 家</b><p>涉及 ARR ¥418K</p></div></li>
+            <li><span class="sev mid">中</span><div><b>华东区投放 CPA 上升 38%</b><p>建议暂停 2 个低效计划</p></div></li>
+            <li><span class="sev low">低</span><div><b>移动端埋点缺失 3 个事件</b><p>影响漏斗口径</p></div></li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="page-foot">
+        <span>数据延迟 &lt; 5 分钟 · 口径 v3.2</span>
+        <button class="link-btn js-demo-trigger" data-mode="dock">把 Aria 停靠到侧边 →</button>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================
+     Agent 悬浮窗：启动器（FAB / 气泡态）
+     ============================================================ -->
+<div class="launcher" id="launcher" data-state="fab">
+  <button class="fab" id="fab" aria-label="打开 Nova Copilot（⌘/Ctrl + J）" aria-expanded="false" aria-controls="agent">
+    <span class="fab-ring" aria-hidden="true"></span>
+    <svg class="fab-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+      <path d="M12 3.2 13.9 9l5.8 1.9-5.8 1.9L12 18.6l-1.9-5.8L4.3 10.9 10.1 9 12 3.2Z" fill="currentColor"/>
+      <circle cx="19" cy="18.4" r="1.7" fill="currentColor" opacity=".85"/>
+    </svg>
+    <span class="fab-spark" aria-hidden="true"></span>
+  </button>
+  <span class="fab-hint" id="fabHint">按 <kbd>Ctrl</kbd>+<kbd>J</kbd> 唤起 Aria</span>
+  <span class="fab-badge" id="fabBadge" aria-hidden="true">1</span>
+</div>
+
+<!-- ============================================================
+     Agent 面板
+     ============================================================ -->
+<section class="agent" id="agent" role="dialog" aria-modal="false" aria-labelledby="agentTitle" aria-describedby="agentDesc" tabindex="-1" hidden>
+  <div class="agent-resize" id="agentResize" title="拖拽调整宽度" aria-hidden="true"></div>
+
+  <header class="agent-head" id="agentHead">
+    <div class="agent-id">
+      <span class="agent-avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17"><path d="M12 3.2 13.9 9l5.8 1.9-5.8 1.9L12 18.6l-1.9-5.8L4.3 10.9 10.1 9 12 3.2Z" fill="currentColor"/></svg>
+        <i class="presence"></i>
+      </span>
+      <span class="agent-meta">
+        <span class="agent-title" id="agentTitle">Aria <em>Copilot</em></span>
+        <span class="agent-sub" id="agentDesc"><i class="live-dot"></i>在线 · 上下文已注入</span>
+      </span>
+    </div>
+
+    <div class="head-actions">
+      <button class="icon-btn ctx-btn" id="ctxBtn" aria-expanded="false" aria-controls="ctxPop" title="查看注入的页面上下文">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 12h4l2 6 4-12 2 6h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="ctx-count" id="ctxCount">4</span>
+      </button>
+
+      <div class="modes" role="group" aria-label="窗口形态">
+        <button class="mode-btn" data-set-mode="dock" title="停靠（Docked）" aria-label="停靠模式" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15 4v16" stroke="currentColor" stroke-width="1.8"/></svg>
+        </button>
+        <button class="mode-btn" data-set-mode="float" title="浮动（Overlay）" aria-label="浮动模式" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="3" y="5" width="13" height="11" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 14h6a3 3 0 0 1 3 3v1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="2.5 2.5"/></svg>
+        </button>
+        <button class="mode-btn" data-set-mode="pip" title="画中画（Picture-in-Picture）" aria-label="画中画模式" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="12.5" y="11.5" width="6.5" height="5" rx="1.2" fill="currentColor"/></svg>
+        </button>
+        <button class="mode-btn" data-set-mode="full" title="全屏（Full-screen）" aria-label="全屏模式" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M9 20H4v-5M15 20h5v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <span class="head-sep" aria-hidden="true"></span>
+      <button class="icon-btn" id="newChatBtn" title="新对话（Alt+N）" aria-label="新对话">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="historyBtn" title="历史记录" aria-label="历史记录">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3.5 4v4.5H8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4.3l2.8 1.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="设置" aria-label="设置">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.2M12 18.8V21M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="minimizeBtn" title="收起为悬浮球（Esc）" aria-label="收起">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 12h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn only-overlay" id="closeBtn" title="关闭（Esc）" aria-label="关闭对话">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="ctx-strip" id="ctxStrip">
+    <button class="ctx-pill" id="ctxPill" aria-expanded="false" aria-controls="ctxPop">
+      <span class="ctx-page-icon" aria-hidden="true">◪</span>
+      <span class="ctx-label">增长驾驶舱</span>
+      <span class="ctx-sep">·</span>
+      <span class="ctx-scope" id="ctxScope">选中：KPI 卡片 ×4</span>
+      <svg class="ctx-caret" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="ctx-pop" id="ctxPop" hidden>
+      <div class="ctx-pop-head"><b>注入的上下文</b><span class="mini-tag">自动</span></div>
+      <ul class="ctx-list" id="ctxList"></ul>
+      <div class="ctx-pop-foot">
+        <span>仅本次会话可见 · 可随时关闭</span>
+        <button class="link-btn" id="ctxRefresh">重新采集</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="thread" id="thread" role="log" aria-live="polite" aria-relevant="additions text" aria-label="对话记录" tabindex="0">
+    <div class="thread-inner" id="threadInner"></div>
+  </div>
+
+  <div class="jump-bottom" id="jumpBottom" hidden>
+    <button class="jump-btn" id="jumpBtn">
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 5v14m0 0 5-5m-5 5-5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      回到底部<span class="new-count" id="newCount" hidden>3</span>
+    </button>
+  </div>
+
+  <div class="composer" id="composer">
+    <div class="queue-tray" id="queueTray" hidden>
+      <div class="queue-head">
+        <span><b id="queueCount">0</b> 条消息排队中 · Agent 完成后自动发送</span>
+        <button class="link-btn" id="queueClear">清空</button>
+      </div>
+      <ul class="queue-list" id="queueList"></ul>
+    </div>
+
+    <div class="attachments" id="attachments" hidden></div>
+
+    <div class="composer-box" id="composerBox">
+      <div class="composer-glow" aria-hidden="true"></div>
+      <textarea id="input" rows="1" placeholder="问点什么，或输入 / 查看指令…" aria-label="输入消息" autocomplete="off" spellcheck="false"></textarea>
+      <div class="composer-tools">
+        <div class="tools-left">
+          <button class="tool-btn" id="attachBtn" title="上传文件（≤ 5 个，单个 ≤ 4MB）" aria-label="上传文件">
+            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+          </button>
+          <button class="tool-btn" id="micBtn" title="语音输入（Web Speech API）" aria-label="语音输入" aria-pressed="false">
+            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+          <span class="tool-sep" aria-hidden="true"></span>
+          <button class="cmd-chip" data-cmd="/analyze">/analyze</button>
+          <button class="cmd-chip" data-cmd="/chart">/chart</button>
+          <button class="cmd-chip" data-cmd="/diff">/diff</button>
+          <button class="cmd-chip cmd-more" id="cmdMore" aria-label="更多指令">+</button>
+        </div>
+        <div class="tools-right">
+          <span class="char-count" id="charCount" hidden>0/2000</span>
+          <button class="send-btn" id="sendBtn" title="发送（Enter）" aria-label="发送消息">
+            <svg class="ic-send" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4.5 12h14m0 0-5.5-5.5M18.5 12 13 17.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="ic-stop" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer-foot">
+      <span class="hint" id="composerHint"><kbd>Enter</kbd> 发送 · <kbd>Shift</kbd>+<kbd>Enter</kbd> 换行 · <kbd>⌘/Ctrl</kbd>+<kbd>J</kbd> 唤起</span>
+      <div class="foot-right">
+        <button class="mini-toggle" id="contextToggle" aria-pressed="true" title="自动注入当前页面上下文">
+          <span class="switch" aria-hidden="true"></span>上下文
+        </button>
+        <span class="esc-hint">Esc 收起</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="pip-chrome" id="pipChrome" hidden>
+    <i class="pip-live" aria-hidden="true"></i>
+    <span>正在旁听 · 点击展开工作台</span>
+    <button class="icon-btn" id="pipExpand" aria-label="展开面板" title="展开为浮动面板">
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- 遮罩：overlay 模式使用，点击关闭 -->
+<div class="backdrop" id="backdrop" hidden></div>
+
+<!-- Toast 区 -->
+<div class="toast-stack" id="toasts" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     历史记录弹窗（模态层级，z-index 高于悬浮窗）
+     ============================================================ -->
+<div class="modal" id="historyModal" hidden>
+  <div class="modal-backdrop" data-close-modal="historyModal"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+    <div class="modal-head">
+      <div><h3 id="histTitle">对话历史</h3><p>保存在本地，最多 20 条</p></div>
+      <div class="modal-head-actions">
+        <button class="ghost-btn" id="exportBtn">导出 JSON</button>
+        <button class="icon-btn" data-close-modal="historyModal" aria-label="关闭">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <button class="new-chat-row" id="modalNewChat"><span>＋</span> 新建对话</button>
+      <ul class="session-list" id="sessionList"></ul>
+    </div>
+    <div class="modal-foot"><span class="kbd-hint"><kbd>Alt</kbd>+<kbd>N</kbd> 新对话</span><button class="danger-link" id="clearAllBtn">清空全部历史</button></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     设置弹窗
+     ============================================================ -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-backdrop" data-close-modal="settingsModal"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="modal-head">
+      <div><h3 id="setTitle">偏好设置</h3><p>即时生效 · 自动保存</p></div>
+      <button class="icon-btn" data-close-modal="settingsModal" aria-label="关闭">
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="set-group">
+        <h4>上下文</h4>
+        <label class="set-row"><span><b>自动注入页面上下文</b><small>URL、DOM 摘要、选中文本、用户身份</small></span><input type="checkbox" id="setContext" checked><i class="sw"></i></label>
+        <label class="set-row"><span><b>允许 Agent 操作页面</b><small>例如高亮指标、滚动到目标区块</small></span><input type="checkbox" id="setHostActions" checked><i class="sw"></i></label>
+      </div>
+      <div class="set-group">
+        <h4>交互</h4>
+        <label class="set-row"><span><b>智能滚动</b><small>流式输出时自动跟随，上滑后暂停</small></span><input type="checkbox" id="setAutoScroll" checked><i class="sw"></i></label>
+        <label class="set-row"><span><b>减少动效</b><small>关闭打字机与过渡动画</small></span><input type="checkbox" id="setReduceMotion"><i class="sw"></i></label>
+        <label class="set-row"><span><b>回复速度</b><small>演示用</small></span>
+          <select id="setSpeed" class="mini-select"><option value="1.6">慢</option><option value="1" selected>标准</option><option value="0.45">快</option></select>
+        </label>
+      </div>
+      <div class="set-group">
+        <h4>外观</h4>
+        <div class="set-row static"><span><b>主题</b><small>同步宿主页面</small></span>
+          <div class="seg small" id="themeSeg"><button data-theme="dark" class="on">深色</button><button data-theme="light">浅色</button></div>
+        </div>
+      </div>
+      <div class="set-group">
+        <h4>快捷键</h4>
+        <ul class="kbd-list">
+          <li><span>唤起 / 切换面板</span><kbd>Ctrl</kbd><kbd>J</kbd></li>
+          <li><span>收起为悬浮球</span><kbd>Esc</kbd></li>
+          <li><span>发送消息</span><kbd>Enter</kbd></li>
+          <li><span>换行</span><kbd>Shift</kbd><kbd>Enter</kbd></li>
+          <li><span>新对话</span><kbd>Alt</kbd><kbd>N</kbd></li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="danger-link" id="resetBtn">重置窗口与本地数据</button><button class="ghost-btn" data-close-modal="settingsModal">完成</button></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     演示工具栏（仅 demo 用）
+     ============================================================ -->
+<div class="demo-bar" id="demoBar">
+  <button class="demo-toggle" id="demoToggle" aria-expanded="false" aria-controls="demoPanel">
+    <span class="beaker" aria-hidden="true">⚗</span> Demo
+  </button>
+  <div class="demo-panel" id="demoPanel" hidden>
+    <p class="demo-title">形态</p>
+    <div class="demo-grid">
+      <button data-set-mode="dock">停靠</button><button data-set-mode="float">浮动</button>
+      <button data-set-mode="pip">画中画</button><button data-set-mode="full">全屏</button>
+      <button data-set-mode="closed">悬浮球</button>
+    </div>
+    <p class="demo-title">场景（会发送示例指令）</p>
+    <div class="demo-grid two">
+      <button data-scenario="analyze">📉 收入异动归因</button>
+      <button data-scenario="approval">🛡 审批：发布周报</button>
+      <button data-scenario="chart">📊 生成图表</button>
+      <button data-scenario="diff">🧩 代码 Diff</button>
+      <button data-scenario="form">🧾 结构化表单</button>
+      <button data-scenario="long">🧵 长对话/引用</button>
+    </div>
+    <p class="demo-title">Viewport</p>
+    <div class="demo-grid">
+      <button data-device="desktop" class="on">桌面</button><button data-device="mobile">移动</button>
+    </div>
+    <p class="demo-title">调试</p>
+    <div class="demo-grid two">
+      <button data-debug="layers">显示层级</button><button data-debug="reset">重置数据</button>
+    </div>
+    <p class="demo-note">演示数据均为前端模拟，无真实网络请求。</p>
+  </div>
+</div>
+
+<script src="app.js?v=20260922"></script>
+</body>
+</html>
