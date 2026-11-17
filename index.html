@@ -1,12 +1,24 @@
 <!doctype html>
-<html lang="zh-CN" data-theme="dark" data-mode="closed" data-device="desktop">
+<html lang="zh-CN" data-theme="light" data-mode="closed" data-device="desktop">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark light">
+<meta name="color-scheme" content="light dark">
 <title>Nova Copilot · AI Agent 悬浮窗 Demo</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%237c8bff'/%3E%3Cpath d='M12 4.5 13.6 9.4 18.5 11l-4.9 1.6L12 17.5l-1.6-4.9L5.5 11l4.9-1.6L12 4.5Z' fill='white'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="styles.css?v=20260922">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234f5df0'/%3E%3Cpath d='M12 4.5 13.6 9.4 18.5 11l-4.9 1.6L12 17.5l-1.6-4.9L5.5 11l4.9-1.6L12 4.5Z' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css?v=20260924">
+<script>
+  /* apply the saved theme before first paint to avoid a flash */
+  (function () {
+    try {
+      var saved = JSON.parse(localStorage.getItem('nova.copilot.v1') || '{}');
+      var q = new URLSearchParams(location.search).get('theme');
+      var systemLight = !window.matchMedia || !window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = (q === 'dark' || q === 'light') ? q : ((saved && saved.theme) || (systemLight ? 'light' : 'dark'));
+      document.documentElement.dataset.theme = theme;
+    } catch (e) { document.documentElement.dataset.theme = 'light'; }
+  })();
+</script>
 </head>
 <body>
 
@@ -395,7 +407,7 @@
       <div class="set-group">
         <h4>外观</h4>
         <div class="set-row static"><span><b>主题</b><small>同步宿主页面</small></span>
-          <div class="seg small" id="themeSeg"><button data-theme="dark" class="on">深色</button><button data-theme="light">浅色</button></div>
+          <div class="seg small" id="themeSeg"><button data-theme="light" class="on">浅色</button><button data-theme="dark">深色</button></div>
         </div>
       </div>
       <div class="set-group">
@@ -448,6 +460,6 @@
   </div>
 </div>
 
-<script src="app.js?v=20260922"></script>
+<script src="app.js?v=20260924"></script>
 </body>
 </html>

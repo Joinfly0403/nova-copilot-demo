@@ -25,7 +25,7 @@
     mode: 'closed',
     geo: { w: 480, h: 800, t: null, l: null, corner: 'br' },
     sheetH: 0.66,
-    theme: 'dark',
+    theme: 'light',
     device: 'desktop',
     prefs: { context: true, hostActions: true, autoScroll: true, reduceMotion: false, speed: 1 },
     sessions: [],
@@ -83,6 +83,7 @@
     } catch (e) { return structuredClone(defaults); }
   }
 
+  const hadSavedState = (function () { try { return !!localStorage.getItem(STORE_KEY); } catch (e) { return false; } })();
   const store = load();
   const save = debounce(function () {
     try {
@@ -1917,7 +1918,7 @@
     const modeBtn = e.target.closest('[data-set-mode]');
     if (modeBtn) { e.preventDefault(); setMode(modeBtn.dataset.setMode); return; }
     const themeBtn = e.target.closest('#themeSeg button');
-    if (themeBtn) { store.theme = themeBtn.dataset.theme; applyTheme(); save(); return; }
+    if (themeBtn) { store.theme = themeBtn.dataset.theme; applyTheme(); try { localStorage.setItem(STORE_KEY + '.themePinned', '1'); } catch (e) {} save(); toast('ok', store.theme === 'light' ? '已切换为浅色' : '已切换为深色'); return; }
     const devBtn = e.target.closest('[data-device]');
     if (devBtn) {
       store.device = devBtn.dataset.device;
@@ -2444,7 +2445,15 @@
     initSheet();
 
     const qs = new URLSearchParams(location.search);
-    if (qs.get('theme') === 'light') { store.theme = 'light'; applyTheme(); }
+    const qt = qs.get('theme');
+    if (qt === 'light' || qt === 'dark') {
+      store.theme = qt;
+      applyTheme();
+    } else if (!hadSavedState && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // first visit: respect the OS preference; afterwards the saved choice wins
+      store.theme = 'dark';
+      applyTheme();
+    }
     if (qs.get('device') === 'mobile') { store.device = 'mobile'; applyDevice(); }
     if (qs.get('mode')) {
       const md = qs.get('mode');
